@@ -2,6 +2,21 @@ const express = require("express");
 const router = express.Router();
 const db = require("../data/helpers/userDb");
 
+//Middleware To capitalize the first letter of the first Name
+const capFirstName = (req, res, next) => {
+  let { name } = req.body;
+  //if there's no name than call next with the error
+  if (!name) {
+    next({ error: "Please provide a name for the user." });
+  } else {
+    name = name.charAt(0).toUpperCase() + name.slice(1);
+    req.body.name = name;
+    next();
+  }
+};
+
+//git commit -m "Adds Middleware That Capitalizes The First Letter Of The Name"
+
 router.get("/", async (req, res) => {
   try {
     const users = await db.get();
@@ -14,11 +29,11 @@ router.get("/", async (req, res) => {
 });
 
 //write middleware to handle missing stuff
-router.post("/", async ({ body: name }, res) => {
+router.post("/", capFirstName, async ({ body: name }, res) => {
   try {
     if (!name) {
       res.status(400).json({
-        errorMessage: "Please provide a name for the user."
+        error: "Please provide a name for the user."
       });
     } else {
       const user = await db.insert(name);
@@ -30,26 +45,30 @@ router.post("/", async ({ body: name }, res) => {
 });
 
 //{ body: name } === const name = req.body
-router.put("/:id", async ({ body: name, params: { id } }, res) => {
-  try {
-    if (!name) {
-      res.status(400).json({
-        errorMessage: "Please provide a name for the user."
-      });
-    } else {
-      //returns number of users updated
-      const updated = await db.update(id, name);
-      if (!updated) {
-        res.status(500).json({ error: "Could Not Update The User" });
+router.put(
+  "/:id",
+  capFirstName,
+  async ({ body: name, params: { id } }, res) => {
+    try {
+      if (!name) {
+        res.status(400).json({
+          errorMessage: "Please provide a name for the user."
+        });
       } else {
-        const user = await db.getById(id);
-        res.status(201).json(user);
+        //returns number of users updated
+        const updated = await db.update(id, name);
+        if (!updated) {
+          res.status(500).json({ error: "Could Not Update The User" });
+        } else {
+          const user = await db.getById(id);
+          res.status(201).json(user);
+        }
       }
+    } catch (e) {
+      res.status(500).json({ error: "Could Not Update the User" });
     }
-  } catch (e) {
-    res.status(500).json({ error: "Could Not Update the User" });
   }
-});
+);
 
 router.get("/:id", async ({ params: { id } }, res) => {
   try {
@@ -80,6 +99,12 @@ router.get("/:id/posts", async ({ params: { id } }, res) => {
   } catch (e) {
     res.status(500).json({ error: "Could Not Retrieve Posts" });
   }
+});
+
+router.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).json(err);
 });
 
 module.exports = router;
