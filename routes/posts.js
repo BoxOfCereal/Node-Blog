@@ -34,4 +34,21 @@ router.get("/:id", async ({ params: { id } }, res) => {
   }
 });
 
+router.put("/:id", async ({ body: post, params: { id } }, res) => {
+  try {
+    if (!post.text || !post.user_id) {
+      res.status(400).json({ error: "Post Requires Text And User Id" });
+    } else {
+      const count = await db.update(id, post);
+      if (!count) res.status(500).json({ error: "Could Not Update The Post" });
+      else {
+        const p = await db.getById(id);
+        res.status(200).json(p);
+      }
+    }
+  } catch (e) {
+    res.status(500).json({ error: "Could Not Retrieve Posts" });
+  }
+});
+
 module.exports = router;
