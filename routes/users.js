@@ -51,4 +51,14 @@ router.put("/:id", async ({ body: name, params: { id } }, res) => {
   }
 });
 
+router.get("/:id", async ({ params: { id } }, res) => {
+  try {
+    const user = await db.getById(id);
+    if (user) res.status(200).json(user);
+    else res.status(404).json({ error: "User Does Not Exist" });
+  } catch (e) {
+    res.status(500).json({ error: "Could Not Get User" });
+  }
+});
+
 module.exports = router;
