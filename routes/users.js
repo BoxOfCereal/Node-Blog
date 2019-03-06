@@ -13,4 +13,20 @@ router.get("/", async (req, res) => {
   }
 });
 
+//write middleware to handle missing stuff
+router.post("/", async ({ body: name }, res) => {
+  try {
+    if (!name) {
+      res.status(400).json({
+        errorMessage: "Please provide a name for the user."
+      });
+    } else {
+      const user = await db.insert(name);
+      res.status(201).json(user);
+    }
+  } catch (e) {
+    res.status(500).json({ error: "Could Not Create the User" });
+  }
+});
+
 module.exports = router;
