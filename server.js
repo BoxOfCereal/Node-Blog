@@ -14,4 +14,8 @@ server.use("/api/users", userRoutes);
 const postsRoutes = require("./routes/posts");
 server.use("/api/posts", postsRoutes);
 
+server.get("*", (req, res) => {
+  res.status(404).json({ error: "This Endpoint Does Not Exist" });
+});
+
 module.exports = server;
