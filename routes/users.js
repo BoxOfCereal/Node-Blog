@@ -71,4 +71,15 @@ router.delete("/:id", async ({ params: { id } }, res) => {
   }
 });
 
+router.get("/:id/posts", async ({ params: { id } }, res) => {
+  try {
+    const posts = await db.getUserPosts(id);
+    if (posts) res.status(200).json(posts);
+    else
+      res.status(404).json({ error: "Cannot Get Posts From Nonexistent User" });
+  } catch (e) {
+    res.status(500).json({ error: "Could Not Retrieve Posts" });
+  }
+});
+
 module.exports = router;
