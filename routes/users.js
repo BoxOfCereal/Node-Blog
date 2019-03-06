@@ -29,4 +29,26 @@ router.post("/", async ({ body: name }, res) => {
   }
 });
 
+//{ body: name } === const name = req.body
+router.put("/:id", async ({ body: name, params: { id } }, res) => {
+  try {
+    if (!name) {
+      res.status(400).json({
+        errorMessage: "Please provide a name for the user."
+      });
+    } else {
+      //returns number of users updated
+      const updated = await db.update(id, name);
+      if (!updated) {
+        res.status(500).json({ error: "Could Not Update The User" });
+      } else {
+        const user = await db.getById(id);
+        res.status(201).json(user);
+      }
+    }
+  } catch (e) {
+    res.status(500).json({ error: "Could Not Update the User" });
+  }
+});
+
 module.exports = router;
