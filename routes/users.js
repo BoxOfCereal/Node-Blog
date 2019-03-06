@@ -61,4 +61,14 @@ router.get("/:id", async ({ params: { id } }, res) => {
   }
 });
 
+router.delete("/:id", async ({ params: { id } }, res) => {
+  try {
+    const count = await db.remove(id);
+    if (count) res.status(200).json({ message: "User Deleted" });
+    else res.status(404).json({ error: "Cannot Delete Nonexistent User" });
+  } catch (e) {
+    res.status(500).json({ error: "Could Not Delete User" });
+  }
+});
+
 module.exports = router;
