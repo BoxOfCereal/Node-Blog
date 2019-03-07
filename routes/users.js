@@ -15,8 +15,6 @@ const capFirstName = (req, res, next) => {
   }
 };
 
-//git commit -m "Adds Middleware That Capitalizes The First Letter Of The Name"
-
 router.get("/", async (req, res) => {
   try {
     const users = await db.get();
