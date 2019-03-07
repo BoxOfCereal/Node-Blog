@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../data/helpers/userDb");
+const postDb = require("../data/helpers/postDb");
 
 //Middleware To capitalize the first letter of the first Name
 const capFirstName = (req, res, next) => {
@@ -80,6 +81,7 @@ router.get("/:id", async ({ params: { id } }, res) => {
 
 router.delete("/:id", async ({ params: { id } }, res) => {
   try {
+    postDb.removeByUser(id);
     const count = await db.remove(id);
     if (count) res.status(200).json({ message: "User Deleted" });
     else res.status(404).json({ error: "Cannot Delete Nonexistent User" });
